@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
+All colors MUST be HSL. */
+
+@layer base {
+  :root {
+    /* Pastel theme */
+    --background: 0 0% 99%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 15%;
+
+    --primary: 330 75% 60%; /* Pastel pink */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 210 40% 96%; /* Soft blue-gray */
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 210 30% 96%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 270 60% 94%; /* Gentle lavender */
+    --accent-foreground: 264 55% 30%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 25% 90%;
+    --input: 210 25% 90%;
+    --ring: 330 75% 60%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar tokens (kept for compatibility) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gradients & shadows */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary) / 0.25), hsl(280 70% 65% / 0.18));
+    --gradient-subtle: radial-gradient(1200px 600px at 50% -10%, hsl(330 75% 96% / 0.8), transparent 70%),
+      radial-gradient(900px 500px at 80% 10%, hsl(260 70% 96% / 0.7), transparent 60%),
+      radial-gradient(1000px 600px at 20% 0%, hsl(200 70% 96% / 0.6), transparent 65%);
+
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.25);
+    --shadow-glow: 0 0 40px hsl(280 70% 65% / 0.25);
+  }
+
+  .dark {
+    --background: 230 25% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 230 25% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 230 25% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 330 75% 70%;
+    --primary-foreground: 230 25% 8%;
+
+    --secondary: 230 25% 14%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 230 25% 14%;
+    --muted-foreground: 215 20% 70%;
+
+    --accent: 270 50% 24%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 230 20% 18%;
+    --input: 230 20% 18%;
+    --ring: 330 75% 70%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+/* Utilities tied to the design system */
+@layer utilities {
+  .bg-gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+  .surface-card {
+    @apply bg-card border rounded-lg shadow-sm;
+    box-shadow: var(--shadow-elegant);
+  }
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  .story-link {
+    position: relative; display: inline-block;
+  }
+  .story-link::after {
+    content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    transform-origin: bottom right; transform: scaleX(0);
+    background: hsl(var(--primary)); transition: transform 300ms ease;
+  }
+  .story-link:hover::after { transform-origin: bottom left; transform: scaleX(1); }
+}
