@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { EntriesList } from "@/components/EntriesList";
+import { Database } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import PotImg from "@/assets/pot.png";
@@ -172,47 +175,45 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto pb-44">
-        <section className="max-w-3xl mx-auto p-6 md:p-8 surface-card animate-enter">
-          <form onSubmit={onSubmit} className="space-y-6">
-            <div className="text-left">
-              <Label htmlFor="roll" className="text-sm">Roll number</Label>
-              <Input
-                id="roll"
-                placeholder="Enter roll number"
-                inputMode="numeric"
-                value={roll}
-                onChange={(e) => setRoll(e.currentTarget.value)}
-                required
-              />
-            </div>
+        <form onSubmit={onSubmit} className="space-y-6 max-w-3xl mx-auto">
+          <div className="text-left">
+            <Label htmlFor="roll" className="text-sm">Roll number</Label>
+            <Input
+              id="roll"
+              placeholder="Enter roll number"
+              inputMode="numeric"
+              value={roll}
+              onChange={(e) => setRoll(e.currentTarget.value)}
+              required
+            />
+          </div>
 
-            <div>
-              <p className="mb-3 font-medium">Choose flower petals</p>
-              <div className="flex flex-wrap justify-center gap-4">
-                {FLOWER_PETALS.map((petal, index) => (
-                  <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
-                    <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
-                    <div
-                      ref={(el) => (optionImgRefs.current[petal.id] = el)}
-                      className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
-                      style={{
-                        backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
-                        borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
-                        opacity: selected[petal.id] ? 1 : 0.4,
-                      }}
-                    />
-                  </label>
-                ))}
-              </div>
+          <div>
+            <p className="mb-3 font-medium">Choose flower petals</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              {FLOWER_PETALS.map((petal, index) => (
+                <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
+                  <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
+                  <div
+                    ref={(el) => (optionImgRefs.current[petal.id] = el)}
+                    className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
+                    style={{
+                      backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
+                      borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
+                      opacity: selected[petal.id] ? 1 : 0.4,
+                    }}
+                  />
+                </label>
+              ))}
             </div>
+          </div>
 
-            <div className="pt-2">
-              <Button type="submit" disabled={animating} className="w-full md:w-auto">
-                {animating ? "Animating..." : "Submit"}
-              </Button>
-            </div>
-          </form>
-        </section>
+          <div className="pt-2">
+            <Button type="submit" disabled={animating} className="w-full md:w-auto">
+              {animating ? "Animating..." : "Submit"}
+            </Button>
+          </div>
+        </form>
       </main>
 
       {/* Fixed individual pots at the bottom */}
@@ -238,6 +239,27 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* Hidden admin button */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="fixed bottom-2 right-2 opacity-20 hover:opacity-100 transition-opacity"
+          >
+            <Database size={16} />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>All Entries</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[60vh]">
+            <EntriesList />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
