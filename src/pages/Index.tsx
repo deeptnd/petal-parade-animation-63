@@ -197,13 +197,13 @@ const Index = () => {
 
                 <div>
                   <p className="mb-3 font-medium">Choose flower petals</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div className="flex flex-wrap justify-center gap-4">
                     {FLOWER_PETALS.map((petal, index) => (
-                      <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center p-2 rounded-md border hover-scale cursor-pointer bg-background">
+                      <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
                         <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
                         <div
                           ref={(el) => (optionImgRefs.current[petal.id] = el)}
-                          className="shrink-0 w-8 h-8 rounded-full transition-all duration-200 border-2"
+                          className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
                           style={{
                             backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
                             borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
