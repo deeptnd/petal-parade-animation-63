@@ -190,7 +190,7 @@ const Index = () => {
 
           <div>
             <p className="mb-3 font-medium">Choose flower petals</p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3 justify-items-center">
               {FLOWER_PETALS.map((petal, index) => (
                 <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
                   <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />

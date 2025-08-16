@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/integrations/supabase/client'
-import { exportToPDF } from '@/lib/pdfExport'
+import { exportToExcel } from '@/lib/excelExport'
 import { useToast } from '@/hooks/use-toast'
 import { Download, Flower } from 'lucide-react'
 
 interface FlowerEntry {
-  id?: number
+  id: number
   roll_number: string
   selected_petals: string[]
-  created_at?: string
+  created_at: string
 }
 
 const FLOWER_PETALS = [
@@ -54,7 +54,7 @@ export const EntriesList = () => {
     fetchEntries()
   }, [])
 
-  const handleExportPDF = () => {
+  const handleExportExcel = async () => {
     if (entries.length === 0) {
       toast({
         title: "No entries",
@@ -63,11 +63,20 @@ export const EntriesList = () => {
       })
       return
     }
-    exportToPDF(entries)
-    toast({
-      title: "Success",
-      description: "PDF exported successfully!"
-    })
+    
+    try {
+      await exportToExcel(entries)
+      toast({
+        title: "Success",
+        description: "Excel file exported successfully!"
+      })
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the Excel file.",
+        variant: "destructive"
+      })
+    }
   }
 
   const getPetalColor = (petalId: string) => {
@@ -97,9 +106,9 @@ export const EntriesList = () => {
           <Flower className="w-5 h-5" />
           All Entries ({entries.length})
         </CardTitle>
-        <Button onClick={handleExportPDF} variant="outline" size="sm">
+        <Button onClick={handleExportExcel} variant="outline" size="sm">
           <Download className="w-4 h-4 mr-2" />
-          Export PDF
+          Export Excel
         </Button>
       </CardHeader>
       <CardContent>
@@ -115,8 +124,8 @@ export const EntriesList = () => {
                   <div>
                     <p className="font-medium">Roll Number: {entry.roll_number}</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(entry.created_at!).toLocaleDateString()} at{' '}
-                      {new Date(entry.created_at!).toLocaleTimeString()}
+                      {new Date(entry.created_at).toLocaleDateString()} at{' '}
+                      {new Date(entry.created_at).toLocaleTimeString()}
                     </p>
                   </div>
                 </div>
