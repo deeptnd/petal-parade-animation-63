@@ -1,6 +1,11 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { FlowerEntry } from './supabase'
+export interface FlowerEntry {
+  id?: number
+  roll_number: string
+  selected_petals: string[]
+  created_at?: string
+}
 
 export const exportToPDF = (entries: FlowerEntry[]) => {
   const doc = new jsPDF()

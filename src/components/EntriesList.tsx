@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { supabase, FlowerEntry } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { exportToPDF } from '@/lib/pdfExport'
 import { useToast } from '@/hooks/use-toast'
 import { Download, Flower } from 'lucide-react'
+
+interface FlowerEntry {
+  id?: number
+  roll_number: string
+  selected_petals: string[]
+  created_at?: string
+}
 
 const FLOWER_PETALS = [
   { id: "rose", name: "Rose", color: "hsl(345, 85%, 30%)" },
