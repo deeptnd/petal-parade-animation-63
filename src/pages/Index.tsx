@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { EntriesList } from "@/components/EntriesList";
 import confetti from "canvas-confetti";
 
 import PotImg from "@/assets/pot.png";
@@ -174,60 +172,47 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto pb-44">
-        <Tabs defaultValue="create" className="max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="create">Create Entry</TabsTrigger>
-            <TabsTrigger value="entries">View All Entries</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="create">
-            <section className="max-w-3xl mx-auto p-6 md:p-8 surface-card animate-enter">
-              <form onSubmit={onSubmit} className="space-y-6">
-                <div className="text-left">
-                  <Label htmlFor="roll" className="text-sm">Roll number</Label>
-                  <Input
-                    id="roll"
-                    placeholder="Enter roll number"
-                    inputMode="numeric"
-                    value={roll}
-                    onChange={(e) => setRoll(e.currentTarget.value)}
-                    required
-                  />
-                </div>
+        <section className="max-w-3xl mx-auto p-6 md:p-8 surface-card animate-enter">
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div className="text-left">
+              <Label htmlFor="roll" className="text-sm">Roll number</Label>
+              <Input
+                id="roll"
+                placeholder="Enter roll number"
+                inputMode="numeric"
+                value={roll}
+                onChange={(e) => setRoll(e.currentTarget.value)}
+                required
+              />
+            </div>
 
-                <div>
-                  <p className="mb-3 font-medium">Choose flower petals</p>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {FLOWER_PETALS.map((petal, index) => (
-                      <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
-                        <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
-                        <div
-                          ref={(el) => (optionImgRefs.current[petal.id] = el)}
-                          className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
-                          style={{
-                            backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
-                            borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
-                            opacity: selected[petal.id] ? 1 : 0.4,
-                          }}
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
+            <div>
+              <p className="mb-3 font-medium">Choose flower petals</p>
+              <div className="flex flex-wrap justify-center gap-4">
+                {FLOWER_PETALS.map((petal, index) => (
+                  <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
+                    <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
+                    <div
+                      ref={(el) => (optionImgRefs.current[petal.id] = el)}
+                      className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
+                      style={{
+                        backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
+                        borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
+                        opacity: selected[petal.id] ? 1 : 0.4,
+                      }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
 
-                <div className="pt-2">
-                  <Button type="submit" disabled={animating} className="w-full md:w-auto">
-                    {animating ? "Animating..." : "Submit"}
-                  </Button>
-                </div>
-              </form>
-            </section>
-          </TabsContent>
-          
-          <TabsContent value="entries">
-            <EntriesList />
-          </TabsContent>
-        </Tabs>
+            <div className="pt-2">
+              <Button type="submit" disabled={animating} className="w-full md:w-auto">
+                {animating ? "Animating..." : "Submit"}
+              </Button>
+            </div>
+          </form>
+        </section>
       </main>
 
       {/* Fixed individual pots at the bottom */}
