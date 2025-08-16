@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      flower_entries: {
+        Row: {
+          created_at: string
+          id: number
+          roll_number: string
+          selected_petals: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          roll_number: string
+          selected_petals: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          roll_number?: string
+          selected_petals?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
