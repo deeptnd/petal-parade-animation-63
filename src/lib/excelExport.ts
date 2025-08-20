@@ -52,52 +52,57 @@ const FLOWER_PETALS = [
 
 export const exportToExcel = (entries: FlowerEntry[]) => {
   try {
-    // Group entries by date
-    const entriesByDate = entries.reduce((acc, entry) => {
-      const date = new Date(entry.created_at).toLocaleDateString();
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(entry);
-      return acc;
-    }, {} as Record<string, FlowerEntry[]>);
+    // Build a list of unique roll numbers per petal (no date grouping)
+    const petalToRollNumbers: Record<string, string[]> = {};
 
-    // Prepare data for Excel with petals as columns
-    const excelData = Object.keys(entriesByDate).map(date => {
-      const dayEntries = entriesByDate[date];
-      const row: any = { 'Date': date };
-      
-      // For each petal type, collect all roll numbers that selected it
-      FLOWER_PETALS.forEach(petal => {
-        const rollNumbers = dayEntries
-          .filter(entry => entry.selected_petals.includes(petal.id))
-          .map(entry => entry.roll_number);
-        
-        // Join roll numbers with line breaks, or show dash if none
-        row[petal.name] = rollNumbers.length > 0 ? rollNumbers.join('\n') : '-';
+    const numericSort = (a: string, b: string) => {
+      const na = parseInt(a, 10);
+      const nb = parseInt(b, 10);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      return a.localeCompare(b, undefined, { numeric: true });
+    };
+
+    FLOWER_PETALS.forEach(petal => {
+      const unique = new Set<string>();
+      entries.forEach(entry => {
+        if (entry.selected_petals?.includes(petal.id)) {
+          unique.add(entry.roll_number);
+        }
       });
-      
-      return row;
+      petalToRollNumbers[petal.name] = Array.from(unique).sort(numericSort);
     });
 
-    // Sort by date
-    excelData.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+    // Determine number of rows by the longest petal list
+    const maxRows = Math.max(
+      0,
+      ...Object.values(petalToRollNumbers).map(list => list.length)
+    );
+
+    // Create row-wise data where each column is a petal name
+    const excelData: any[] = [];
+    for (let i = 0; i < maxRows; i++) {
+      const row: Record<string, string> = {};
+      FLOWER_PETALS.forEach(petal => {
+        const list = petalToRollNumbers[petal.name] || [];
+        row[petal.name] = (list[i] ?? '-') as string;
+      });
+      excelData.push(row);
+    }
 
     // Create workbook and worksheet
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(excelData);
 
-    // Set column widths for the new format
+    // Set column widths for petal columns
     const columnWidths = [
-      { wch: 12 }, // Date
       { wch: 15 }, // Upvaas
       { wch: 15 }, // Ahanik
       { wch: 15 }, // Abhyas
       { wch: 15 }, // Mukhpath
       { wch: 15 }, // Taap
       { wch: 15 }, // Swasthya
-      { wch: 15 }, // Siddhant Pushti
-      { wch: 15 }  // Satsang Prachar
+      { wch: 18 }, // Siddhant Pushti
+      { wch: 18 }  // Satsang Prachar
     ];
     worksheet['!cols'] = columnWidths;
 
