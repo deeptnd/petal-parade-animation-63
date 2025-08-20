@@ -8,45 +8,96 @@ export interface FlowerEntry {
 }
 
 const FLOWER_PETALS = [
-  { id: "rose", name: "Rose", color: "hsl(345, 85%, 30%)" },
-  { id: "tulip", name: "Tulip", color: "hsl(291, 64%, 42%)" },
-  { id: "sunflower", name: "Sunflower", color: "hsl(60, 40%, 40%)" },
-  { id: "lotus", name: "Lotus", color: "hsl(230, 70%, 30%)" },
-  { id: "daisy", name: "Daisy", color: "hsl(120, 60%, 40%)" },
-  { id: "orchid", name: "Orchid", color: "hsl(180, 50%, 35%)" },
-  { id: "cherry", name: "Cherry", color: "hsl(270, 80%, 40%)" },
-  { id: "lavender", name: "Lavender", color: "hsl(30, 100%, 30%)" },
+  { 
+    id: "Upvaas", 
+    name: "Upvaas", 
+    color: "#881337", 
+  },
+  { 
+    id: "Ahanik", 
+    name: "Ahanik", 
+    color: "#86198f", 
+  },
+  { 
+    id: "Abhyas", 
+    name: "Abhyas", 
+    color: "#854d0e", 
+  },
+  { 
+    id: "Mukhpath", 
+    name: "Mukhpath", 
+    color: "#1e40af", 
+  },
+  { 
+    id: "Taap", 
+    name: "Taap", 
+    color: "#166534", 
+  },
+  { 
+    id: "Swasthya", 
+    name: "Swasthya", 
+    color: "#0f766e", 
+  },
+  { 
+    id: "SiddhantPushti", 
+    name: "Siddhant Pushti", 
+    color: "#7e22ce", 
+  },
+  { 
+    id: "SatsangPrachar", 
+    name: "Satsang Prachar", 
+    color: "#9a3412", 
+  },
 ];
 
 export const exportToExcel = (entries: FlowerEntry[]) => {
   try {
-    // Prepare data for Excel
-    const excelData = entries.map(entry => {
-      const selectedPetalNames = entry.selected_petals
-        .map(petalId => {
-          const petal = FLOWER_PETALS.find(p => p.id === petalId);
-          return petal ? petal.name : petalId;
-        })
-        .join(', ');
+    // Group entries by date
+    const entriesByDate = entries.reduce((acc, entry) => {
+      const date = new Date(entry.created_at).toLocaleDateString();
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(entry);
+      return acc;
+    }, {} as Record<string, FlowerEntry[]>);
 
-      return {
-        'Roll Number': entry.roll_number,
-        'Selected Petals': selectedPetalNames,
-        'Created At': new Date(entry.created_at).toLocaleString(),
-        'Entry ID': entry.id
-      };
+    // Prepare data for Excel with petals as columns
+    const excelData = Object.keys(entriesByDate).map(date => {
+      const dayEntries = entriesByDate[date];
+      const row: any = { 'Date': date };
+      
+      // For each petal type, collect all roll numbers that selected it
+      FLOWER_PETALS.forEach(petal => {
+        const rollNumbers = dayEntries
+          .filter(entry => entry.selected_petals.includes(petal.id))
+          .map(entry => entry.roll_number);
+        
+        // Join roll numbers with line breaks, or show dash if none
+        row[petal.name] = rollNumbers.length > 0 ? rollNumbers.join('\n') : '-';
+      });
+      
+      return row;
     });
+
+    // Sort by date
+    excelData.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
 
     // Create workbook and worksheet
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(excelData);
 
-    // Set column widths
+    // Set column widths for the new format
     const columnWidths = [
-      { wch: 15 }, // Roll Number
-      { wch: 30 }, // Selected Petals
-      { wch: 20 }, // Created At
-      { wch: 10 }  // Entry ID
+      { wch: 12 }, // Date
+      { wch: 15 }, // Upvaas
+      { wch: 15 }, // Ahanik
+      { wch: 15 }, // Abhyas
+      { wch: 15 }, // Mukhpath
+      { wch: 15 }, // Taap
+      { wch: 15 }, // Swasthya
+      { wch: 15 }, // Siddhant Pushti
+      { wch: 15 }  // Satsang Prachar
     ];
     worksheet['!cols'] = columnWidths;
 

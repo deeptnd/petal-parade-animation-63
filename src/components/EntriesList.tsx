@@ -14,14 +14,46 @@ interface FlowerEntry {
 }
 
 const FLOWER_PETALS = [
-  { id: "rose", name: "Rose", color: "hsl(345, 85%, 30%)" },
-  { id: "tulip", name: "Tulip", color: "hsl(291, 64%, 42%)" },
-  { id: "sunflower", name: "Sunflower", color: "hsl(60, 40%, 40%)" },
-  { id: "lotus", name: "Lotus", color: "hsl(230, 70%, 30%)" },
-  { id: "daisy", name: "Daisy", color: "hsl(120, 60%, 40%)" },
-  { id: "orchid", name: "Orchid", color: "hsl(180, 50%, 35%)" },
-  { id: "cherry", name: "Cherry", color: "hsl(270, 80%, 40%)" },
-  { id: "lavender", name: "Lavender", color: "hsl(30, 100%, 30%)" },
+  { 
+    id: "Upvaas", 
+    name: "Upvaas", 
+    color: "#881337", 
+  },
+  { 
+    id: "Ahanik", 
+    name: "Ahanik", 
+    color: "#86198f", 
+  },
+  { 
+    id: "Abhyas", 
+    name: "Abhyas", 
+    color: "#854d0e", 
+  },
+  { 
+    id: "Mukhpath", 
+    name: "Mukhpath", 
+    color: "#1e40af", 
+  },
+  { 
+    id: "Taap", 
+    name: "Taap", 
+    color: "#166534", 
+  },
+  { 
+    id: "Swasthya", 
+    name: "Swasthya", 
+    color: "#0f766e", 
+  },
+  { 
+    id: "SiddhantPushti", 
+    name: "Siddhant Pushti", 
+    color: "#7e22ce", 
+  },
+  { 
+    id: "SatsangPrachar", 
+    name: "Satsang Prachar", 
+    color: "#9a3412", 
+  },
 ]
 
 export const EntriesList = () => {
@@ -79,8 +111,32 @@ export const EntriesList = () => {
     }
   }
 
-  const getPetalColor = (petalId: string) => {
-    return FLOWER_PETALS.find(p => p.id === petalId)?.color || 'hsl(var(--muted))'
+  // Group entries by date
+  const groupEntriesByDate = () => {
+    const grouped: Record<string, FlowerEntry[]> = {}
+    
+    entries.forEach(entry => {
+      const date = new Date(entry.created_at).toLocaleDateString()
+      if (!grouped[date]) {
+        grouped[date] = []
+      }
+      grouped[date].push(entry)
+    })
+    
+    return grouped
+  }
+
+  // Get all roll numbers that selected a specific petal on a specific date
+  const getRollNumbersForPetal = (dateEntries: FlowerEntry[], petalId: string) => {
+    const rollNumbers = new Set<string>()
+    
+    dateEntries.forEach(entry => {
+      if (entry.selected_petals.includes(petalId)) {
+        rollNumbers.add(entry.roll_number)
+      }
+    })
+    
+    return Array.from(rollNumbers).sort()
   }
 
   if (loading) {
@@ -98,6 +154,8 @@ export const EntriesList = () => {
       </Card>
     )
   }
+
+  const groupedEntries = groupEntriesByDate()
 
   return (
     <Card>
@@ -117,35 +175,41 @@ export const EntriesList = () => {
             No entries yet. Submit your first flower arrangement!
           </p>
         ) : (
-          <div className="space-y-4">
-            {entries.map((entry) => (
-              <div key={entry.id} className="border rounded-lg p-4 space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">Roll Number: {entry.roll_number}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(entry.created_at).toLocaleDateString()} at{' '}
-                      {new Date(entry.created_at).toLocaleTimeString()}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm mb-2">Selected Petals:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {entry.selected_petals.map((petalId) => (
-                      <div
-                        key={petalId}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full text-xs border"
-                      >
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: getPetalColor(petalId) }}
-                        />
-                        {FLOWER_PETALS.find(p => p.id === petalId)?.name || petalId}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          <div className="overflow-x-auto">
+            {Object.entries(groupedEntries).map(([date, dateEntries]) => (
+              <div key={date} className="mb-8">
+                <h3 className="text-lg font-bold mb-2">{date}</h3>
+                <table className="w-full border-collapse border mb-4">
+                  <thead>
+                    <tr className="bg-muted">
+                      {FLOWER_PETALS.map(petal => (
+                        <th key={petal.id} className="border p-2 text-center">{petal.name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {FLOWER_PETALS.map(petal => {
+                        const rollNumbers = getRollNumbersForPetal(dateEntries, petal.id)
+                        return (
+                          <td key={petal.id} className="border p-2 text-center">
+                            {rollNumbers.length > 0 ? (
+                              <div className="flex flex-col gap-1">
+                                {rollNumbers.map(rollNumber => (
+                                  <div key={rollNumber} className="font-medium">
+                                    {rollNumber}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             ))}
           </div>

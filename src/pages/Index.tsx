@@ -1,45 +1,166 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { EntriesList } from "@/components/EntriesList";
 import { Database } from "lucide-react";
 import confetti from "canvas-confetti";
+import Target from "@/assets/Target.svg";
+import Abhyas from "@/assets/petals/Abhyas.png";
+import Ahanik from "@/assets/petals/Ahanik.png";
+import Mukhpath from "@/assets/petals/Mukhpath.png";
+import SatsangPrachar from "@/assets/petals/Satsang Prachar.png";
+import SiddhanPushti from "@/assets/petals/Siddhant Pushti.png";
+import Taap from "@/assets/petals/Taap.png";
+import Upvaas from "@/assets/petals/Upvaas.png";
+import Swasthya from "@/assets/petals/Swasthya.png";
+import pot1 from "@/assets/Kalash/upvaas.png";
+import pot2 from "@/assets/Kalash/ahanik.png";
+import pot3 from "@/assets/Kalash/abhyas.png";
+import pot4 from "@/assets/Kalash/mukhpath.png";
+import pot5 from "@/assets/Kalash/taap.png";
+import pot6 from "@/assets/Kalash/swasthya.png";
+import pot7 from "@/assets/Kalash/siddhant pushti.png";
+import pot8 from "@/assets/Kalash/satsang prachar.png";
 
-import PotImg from "@/assets/pot.png";
+// Custom SVG Icons for petals
+const UpvaasIcon = () => <img src={Upvaas} alt="upvaas" className="w-16 h-16" />;
+const AhanikIcon = () => <img src={Ahanik} alt="ahanik" className="w-16 h-16" />;
+const AbhyasIcon = () => <img src={Abhyas} alt="abhyas" className="w-16 h-16" />;
+const MukhpathIcon = () => <img src={Mukhpath} alt="mukhpath" className="w-16 h-16" />;
+const TaapIcon = () => <img src={Taap} alt="taap" className="w-16 h-16" />;
+const SwasthyaIcon = () => <img src={Swasthya} alt="swasthya" className="w-16 h-16" />;
+const SiddhantPushtiIcon = () => <img src={SiddhanPushti} alt="siddhant pushti" className="w-16 h-16" />;
+const SatsangPracharIcon = () => <img src={SatsangPrachar} alt="satsang prachar" className="w-16 h-16" />;
+
+// Custom SVG Pots for each flower - Increased size to w-20 h-20
+const UpvaasPot = () => <img src={pot1} alt="upvaas" className="w-20 h-20 drop-shadow-lg" />;
+const AhanikPot = () => <img src={pot2} alt="ahanik" className="w-20 h-20 drop-shadow-lg" />;
+const AbhyasPot = () => <img src={pot3} alt="abhyas" className="w-20 h-20 drop-shadow-lg" />;
+const MukhpathPot = () => <img src={pot4} alt="mukhpath" className="w-20 h-20 drop-shadow-lg" />;
+const TaapPot = () => <img src={pot5} alt="taap" className="w-20 h-20 drop-shadow-lg" />;
+const SwasthyaPot = () => <img src={pot6} alt="swasthya" className="w-20 h-20 drop-shadow-lg" />;
+const SiddhantPushtiPot = () => <img src={pot7} alt="siddhant pushti" className="w-20 h-20 drop-shadow-lg" />;
+const SatsangPracharPot = () => <img src={pot8} alt="satsang prachar" className="w-20 h-20 drop-shadow-lg" />;
 
 interface FlowerPetal {
   id: string;
   name: string;
   color: string;
+  icon: React.ReactNode;
+  pot: React.ReactNode;
 }
 
 const FLOWER_PETALS: FlowerPetal[] = [
-  { id: "rose", name: "Rose", color: "hsl(345, 85%, 30%)" },
-  { id: "tulip", name: "Tulip", color: "hsl(291, 64%, 42%)" },
-  { id: "sunflower", name: "Sunflower", color: "hsl(60, 40%, 40%)" },
-  { id: "lotus", name: "Lotus", color: "hsl(230, 70%, 30%)" },
-  { id: "daisy", name: "Daisy", color: "hsl(120, 60%, 40%)" },
-  { id: "orchid", name: "Orchid", color: "hsl(180, 50%, 35%)" },
-  { id: "cherry", name: "Cherry", color: "hsl(270, 80%, 40%)" },
-  { id: "lavender", name: "Lavender", color: "hsl(30, 100%, 30%)" },
+  { 
+    id: "Upvaas", 
+    name: "Upvaas", 
+    color: "#881337", 
+    icon: <UpvaasIcon/>,
+    pot: <UpvaasPot />
+  },
+  { 
+    id: "Ahanik", 
+    name: "Ahanik", 
+    color: "#86198f", 
+    icon: <AhanikIcon />,
+    pot: <AhanikPot />
+  },
+  { 
+    id: "Abhyas", 
+    name: "Abhyas", 
+    color: "#854d0e", 
+    icon: <AbhyasIcon />,
+    pot: <AbhyasPot />
+  },
+  { 
+    id: "Mukhpath", 
+    name: "Mukhpath", 
+    color: "#1e40af", 
+    icon: <MukhpathIcon />,
+    pot: <MukhpathPot />
+  },
+  { 
+    id: "Taap", 
+    name: "Taap", 
+    color: "#166534", 
+    icon: <TaapIcon />,
+    pot: <TaapPot />
+  },
+  { 
+    id: "Swasthya", 
+    name: "Swasthya", 
+    color: "#0f766e", 
+    icon: <SwasthyaIcon />,
+    pot: <SwasthyaPot />
+  },
+  { 
+    id: "SiddhantPushti", 
+    name: "Siddhant Pushti", 
+    color: "#7e22ce", 
+    icon: <SiddhantPushtiIcon />,
+    pot: <SiddhantPushtiPot />
+  },
+  { 
+    id: "SatsangPrachar", 
+    name: "Satsang Prachar", 
+    color: "#9a3412", 
+    icon: <SatsangPracharIcon />,
+    pot: <SatsangPracharPot />
+  },
 ];
 
 const Index = () => {
   const [roll, setRoll] = useState("");
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [animating, setAnimating] = useState(false);
-  const potRefs = useRef<Record<string, HTMLImageElement | null>>({});
-  const optionImgRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [totalPetals, setTotalPetals] = useState(0);
+  const potRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const optionImgRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { toast } = useToast();
+
+  // Fetch total petals count from database
+  useEffect(() => {
+    const fetchTotalPetals = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('flower_entries')
+          .select('selected_petals');
+
+        if (error) throw error;
+
+        const count = data.reduce((total, entry) => {
+          return total + (entry.selected_petals?.length || 0);
+        }, 18063);
+
+        setTotalPetals(count);
+      } catch (error) {
+        console.error('Error fetching total petals:', error);
+      }
+    };
+
+    fetchTotalPetals();
+  }, []);
 
   const handleChecked = (id: string, value: boolean | "indeterminate") => {
     setSelected((prev) => ({ ...prev, [id]: value === true }));
   };
+
+  // Calculate total selected petals for current user
+  const currentSelected = Object.values(selected).filter(Boolean).length;
 
   const animateOne = async (id: string) => {
     const imgEl = optionImgRefs.current[id];
@@ -49,7 +170,7 @@ const Index = () => {
     const startRect = imgEl.getBoundingClientRect();
     const endRect = potEl.getBoundingClientRect();
 
-    const clone = imgEl.cloneNode(true) as HTMLElement;
+    const clone = imgEl.cloneNode(true) as HTMLDivElement;
     clone.style.position = "fixed";
     clone.style.pointerEvents = "none";
     clone.style.zIndex = "50";
@@ -63,7 +184,7 @@ const Index = () => {
     document.body.appendChild(clone);
 
     const endX = endRect.left + endRect.width / 2;
-    const endY = endRect.top + endRect.height * 0.2; // a bit above the pot rim
+    const endY = endRect.top + endRect.height * 0.2;
 
     const drift = Math.random() * 80 - 40;
     const rotate1 = (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 20);
@@ -104,6 +225,9 @@ const Index = () => {
 
       if (error) throw error;
 
+      // Update total petals count after successful submission
+      setTotalPetals(prev => prev + selectedPetals.length);
+
       toast({
         title: "Entry Saved!",
         description: "Your flower arrangement has been saved successfully."
@@ -118,7 +242,7 @@ const Index = () => {
     }
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (animating) return;
     
@@ -141,19 +265,43 @@ const Index = () => {
       return;
     }
     
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSubmission = async () => {
+    setShowConfirmDialog(false);
     setAnimating(true);
+    
+    const ids = FLOWER_PETALS.map((p) => p.id).filter((id) => selected[id]);
     
     // Run all animations in parallel
     await Promise.all(ids.map(id => animateOne(id)));
     
     setAnimating(false);
     
-    // Trigger confetti after animations complete
+    // Big confetti effect
     confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
+      particleCount: 300,
+      spread: 100,
+      origin: { y: 0.6 },
+      scalar: 1.5
     });
+    
+    // Additional smaller confetti
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        angle: 60,
+        spread: 70,
+        origin: { x: 0, y: 0.7 }
+      });
+      confetti({
+        particleCount: 100,
+        angle: 120,
+        spread: 70,
+        origin: { x: 1, y: 0.7 }
+      });
+    }, 300);
     
     // Save entry to database
     await saveEntry(roll, ids);
@@ -167,15 +315,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <header className="container mx-auto pt-10 pb-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold animate-fade-in">Flower Petal Animator</h1>
-        <p className="mt-3 text-muted-foreground max-w-2xl mx-auto animate-fade-in">
-          Enter your roll number, pick flower petals, and watch them float into the pot with beautiful animations.
-        </p>
+      <header className="container mx-auto pt-10 pb-6 flex flex-col items-center">
+        <img
+          src={Target}
+          width={820}
+          className="max-w-full h-auto"
+          alt="Flower Target"
+        />
+        <div className="mt-4 text-l font-medium  px-4 py-2 text-center">
+          Total Pushp Offered: <br></br><span className="font-bold text-5xl text-blue-600">{totalPetals}</span>
+        </div>
       </header>
 
       <main className="container mx-auto pb-44">
-        <form onSubmit={onSubmit} className="space-y-6 max-w-3xl mx-auto">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
           <div className="text-left">
             <Label htmlFor="roll" className="text-sm">Roll number</Label>
             <Input
@@ -189,56 +342,94 @@ const Index = () => {
           </div>
 
           <div>
-            <p className="mb-3 font-medium">Choose flower petals</p>
+            <div className="flex justify-between items-center mb-3">
+              <p className="font-medium">Choose Pushp</p>
+              <p className="text-sm text-muted-foreground">
+                Your selection: <span className="font-bold">{currentSelected}</span>
+              </p>
+            </div>
             <div className="grid grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3 justify-items-center">
-              {FLOWER_PETALS.map((petal, index) => (
-                <label key={petal.id} htmlFor={petal.id} className="flex items-center justify-center hover-scale cursor-pointer">
-                  <Checkbox id={petal.id} checked={!!selected[petal.id]} onCheckedChange={(v) => handleChecked(petal.id, v)} className="sr-only" />
+              {FLOWER_PETALS.map((petal) => (
+                <label 
+                  key={petal.id} 
+                  htmlFor={petal.id} 
+                  className="flex flex-col items-center gap-1 cursor-pointer"
+                >
+                  <Checkbox 
+                    id={petal.id} 
+                    checked={!!selected[petal.id]} 
+                    onCheckedChange={(v) => handleChecked(petal.id, v)} 
+                    className="sr-only" 
+                  />
                   <div
                     ref={(el) => (optionImgRefs.current[petal.id] = el)}
-                    className="shrink-0 w-12 h-12 rounded-full transition-all duration-200 border-2"
+                    className={`shrink-0 w-15 h-15 rounded-full transition-all duration-200 flex items-center justify-center ${
+                      selected[petal.id] ? 'scale-110' : 'scale-100 opacity-40'
+                    }`}
                     style={{
-                      backgroundColor: selected[petal.id] ? petal.color : 'hsl(var(--muted))',
+                      backgroundColor: selected[petal.id] ? `${petal.color}20` : 'hsl(var(--muted))',
                       borderColor: selected[petal.id] ? petal.color : 'hsl(var(--border))',
-                      opacity: selected[petal.id] ? 1 : 0.4,
                     }}
-                  />
+                  >
+                    {petal.icon}
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">{petal.name}</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div className="pt-2">
-            <Button type="submit" disabled={animating} className="w-full md:w-auto">
-              {animating ? "Animating..." : "Submit"}
+            <Button 
+              type="submit" 
+              disabled={animating || currentSelected === 0} 
+              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700"
+            >
+              {animating ? "Submitting..." : `Submit ${currentSelected > 0 ? `(${currentSelected})` : ''}`}
             </Button>
           </div>
         </form>
       </main>
 
       {/* Fixed individual pots at the bottom */}
-      <div className="fixed inset-x-0 bottom-2 sm:bottom-4 pointer-events-none">
+       <div className="fixed inset-x-0 bottom-4 sm:bottom-6 pointer-events-none">
         <div className="container mx-auto">
-          <div className="mx-auto w-full max-w-3xl">
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3 justify-items-center">
+          <div className="mx-auto w-full max-w-4xl">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3 sm:gap-4 justify-items-center">
               {FLOWER_PETALS.map((petal) => (
                 <div key={petal.id} className="flex flex-col items-center gap-1">
-                  <img
-                    ref={(el) => (potRefs.current[petal.id] = el)}
-                    src={PotImg}
-                    alt={`${petal.name} pot`}
-                    loading="eager"
-                    width={56}
-                    height={56}
-                    className="drop-shadow-lg"
-                  />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground">{petal.name}</span>
+                  <div ref={(el) => (potRefs.current[petal.id] = el)}>
+                    {petal.pot}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Submission</DialogTitle>
+            <DialogDescription>
+              You have selected {currentSelected} pushp. Are you sure you want to submit?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmSubmission}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Hidden admin button */}
       <Dialog>
