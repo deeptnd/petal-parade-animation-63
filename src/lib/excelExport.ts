@@ -52,7 +52,21 @@ const FLOWER_PETALS = [
 
 export const exportToExcel = (entries: FlowerEntry[]) => {
   try {
-    // Build a list of unique roll numbers per petal (no date grouping)
+    // Helper: check if date is today (local)
+    const isToday = (isoString: string) => {
+      const d = new Date(isoString);
+      const now = new Date();
+      return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()
+      );
+    };
+
+    // Only include today's entries
+    const todaysEntries = entries.filter(e => isToday(e.created_at));
+
+    // Build a list of roll numbers per petal, repeating for multiple counts
     const petalToRollNumbers: Record<string, string[]> = {};
 
     const numericSort = (a: string, b: string) => {
@@ -63,13 +77,18 @@ export const exportToExcel = (entries: FlowerEntry[]) => {
     };
 
     FLOWER_PETALS.forEach(petal => {
-      const unique = new Set<string>();
-      entries.forEach(entry => {
-        if (entry.selected_petals?.includes(petal.id)) {
-          unique.add(entry.roll_number);
+      const list: string[] = [];
+      todaysEntries.forEach(entry => {
+        if (Array.isArray(entry.selected_petals)) {
+          const occurrences = entry.selected_petals.filter(id => id === petal.id).length;
+          if (occurrences > 0) {
+            for (let i = 0; i < occurrences; i++) {
+              list.push(entry.roll_number);
+            }
+          }
         }
       });
-      petalToRollNumbers[petal.name] = Array.from(unique).sort(numericSort);
+      petalToRollNumbers[petal.name] = list.sort(numericSort);
     });
 
     // Determine number of rows by the longest petal list
@@ -107,7 +126,7 @@ export const exportToExcel = (entries: FlowerEntry[]) => {
     worksheet['!cols'] = columnWidths;
 
     // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Flower Entries');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Today');
 
     // Generate filename with current date
     const now = new Date();
