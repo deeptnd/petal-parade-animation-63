@@ -35,6 +35,40 @@ export type Database = {
         }
         Relationships: []
       }
+      ,
+      app_settings: {
+        Row: {
+          id: string
+          window_start: string | null
+          window_end: string | null
+          start_time: string | null
+          end_time: string | null
+          enforce_window: boolean | null
+          user_enabled: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          window_start?: string | null
+          window_end?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          enforce_window?: boolean | null
+          user_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          window_start?: string | null
+          window_end?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          enforce_window?: boolean | null
+          user_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
